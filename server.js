@@ -4,9 +4,9 @@ const fs = require('fs');
 const uniqid = require('uniqid');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 
@@ -34,6 +34,6 @@ app.post('/api/notes', (req, res) => {
     res.json(newNote);
 });
 
-app.listen(PORT, () => {
-    console.log(`App listening on PORT ${PORT}`);
-});
+app.listen(PORT, () => 
+    console.log(`App listening on PORT ${PORT}`)
+);
