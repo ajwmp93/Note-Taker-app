@@ -1,18 +1,19 @@
 const express = require('express');
 const path = require('path');
-const fs = require('fs');
+const { readDataFromFile, writeDataToFile } = require('./helpers/fsUtils.js');
 const uniqid = require('uniqid');
+const fs = require('fs');
 
+const dbFilePath = path.join(__dirname, './db/db.json');
 const app = express();
 const PORT = process.env.PORT || 3000;
-const dbFilePath = path.join(__dirname, './db/db.json');
 
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({extended: false}));
 app.use(express.json());
 
 if (!fs.existsSync(dbFilePath)) {
-    fs.writeFileSync(dbFilePath, '[]', 'utf8');
+    console.log('No db.json file exists');
 }
 
 app.get('/', (req, res) => {
@@ -24,7 +25,8 @@ app.get('/notes', (req, res) => {
 });
 
 app.get('/api/notes', (req, res) => {
-    const notes = JSON.parse(fs.readFileSync(dbFilePath, 'utf8'));
+    const notes = readDataFromFile();
+    res.json(notes);
 });
 
 app.post('/api/notes', (req, res) => {
@@ -33,11 +35,10 @@ app.post('/api/notes', (req, res) => {
         title: req.body.title,
         text: req.body.text
     };
-    const notes = JSON.parse(fs.readFileSync(dbFilePath, 'utf8'));
-
+    const notes = readDataFromFile();
     notes.push(newNote);
 
-    fs.writeFileSync(dbFilePath, JSON.stringify(notes, null, 2));
+    writeDataToFile(notes);
 
     res.json(newNote);
 });
